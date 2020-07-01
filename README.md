@@ -1,6 +1,6 @@
 # Windows Logon service
 
-This service is able to run any application on user login screen. I don't remember how it works — I spend several weeks to collect all solutions from internet into one working project. PR are welcome!
+This service is able to run any application on user login screen. I spend several weeks to collect all solutions from internet into one working project. Using specific WinAPI calls this service collects info about logon session and using this info runs application in logon session. PR are welcome!
 
 # How to use
 1. Find in code LogonUI string and replace to your application
