@@ -1,1 +1,0 @@
-LogonService.exe /u
