@@ -7,12 +7,12 @@ This service is able to run any application on user login screen. I spend severa
 # How to use
 1. Download archive for your platform at  [Releases](https://github.com/VoidVolker/Windows-logon-service/releases) paga
 1. Edit configuration file `LogonService.exe.config`:
-    - `OnLogon<string>` - aplication to run at logon screen (mode: immediately restart app if it die)
-    - `LogEnabled<bool>` - turn on/off logging
-    - `LogPath<string>` - full file path to log file (default: `exe dir/log.txt` - not current dir, because for service it will be system32)
-    - `Description<string>` - service description
-    - `DisplayName<string>` - service display name
-    - `ServiceName<string>` - service system level name (no spaces!)
+    - `OnLogon`, `string` - aplication to run at logon screen (mode: immediately restart app if it die)
+    - `LogEnabled`, `bool` - turn on/off logging
+    - `LogPath`, `string` - full file path to log file (default: `exe dir/log.txt` - not current dir, because for service it will be system32)
+    - `Description`, `string` - service description
+    - `DisplayName`, `string` - service display name
+    - `ServiceName`, `string` - service system level name (no spaces!)
 
 1. Install service in command line:
 
