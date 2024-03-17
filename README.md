@@ -28,6 +28,6 @@ LogonService.exe /install
 - `-start` `/start` - start service
 - `-stop` `/stop` - stop service
 
-# Tested in next Operating systems:
+# Operating systems
 
-Windows XP SP3, 7, 8.1, 10
+Windows XP SP3, 7, 8.1, 10, 11
