@@ -19,7 +19,7 @@ This service is able to run any application on user login screen. I spend severa
 ```cmd
 LogonService.exe /install
 ```
- 
+
 # Available commands
 
 - `-i` `/i` `-install` `/install` - install and start service
@@ -28,6 +28,17 @@ LogonService.exe /install
 - `-start` `/start` - start service
 - `-stop` `/stop` - stop service
 
-# Operating systems
+# Operating systems support
 
 Windows XP SP3, 7, 8.1, 10, 11
+
+# Requirements
+
+- DotNet 4.5.1 for Windows XP
+- DotNet 4.8.1 for all other Windows versions
+
+# Sponsors
+
+Big thanks to all open source software sponsors - you make this world better =)
+
+1. [jazir555](https://github.com/jazir555)
