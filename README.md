@@ -39,7 +39,7 @@ Windows XP SP3, 7, 8.1, 10, 11
 - DotNet 4.5.1 for Windows XP
 - DotNet 4.8.1 for all other Windows versions
 
-# TODO:
+# ToDo
 
 - Add config file watcher for options reload in runtime
 
