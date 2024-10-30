@@ -20,6 +20,8 @@ This service is able to run any application on user login screen. I spend severa
 LogonService.exe /install
 ```
 
+Restart service after editing configuration file.
+
 # Available commands
 
 - `-i` `/i` `-install` `/install` - install and start service
@@ -36,6 +38,10 @@ Windows XP SP3, 7, 8.1, 10, 11
 
 - DotNet 4.5.1 for Windows XP
 - DotNet 4.8.1 for all other Windows versions
+
+# TODO:
+
+- Add config file watcher for options reload in runtime
 
 # Sponsors
 
