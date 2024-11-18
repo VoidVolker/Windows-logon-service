@@ -147,6 +147,7 @@ namespace LogonService
 
                 if (Util.TryProc((int)app.ProcInfo.dwProcessId) is Process proc)
                 {
+                    ProcWatcher.IdStopRemove(proc.Id);
                     proc.Kill();
                     Log($"[STOPPED] [{app.Id}] using PID: {proc.Id}");
                 }

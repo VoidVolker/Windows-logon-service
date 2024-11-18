@@ -93,6 +93,14 @@ namespace LogonService.Watchers
         }
 
         /// <summary>
+        /// Remove ID stop event watcher
+        /// </summary>
+        /// <param name="id"></param>
+        public int IdStopRemove(int id) =>
+            IdStopWatchers.RemoveAll(w => w.Options.Id == id);
+
+
+        /// <summary>
         /// Trigger event for selected watchers list
         /// </summary>
         /// <param name="watchers">Watchers list</param>
@@ -114,6 +122,7 @@ namespace LogonService.Watchers
             // Run callbacks in triggered watchers
             triggeredWatchers.ForEach(w => w.Action(pid, ev));
         }
+
 
         /// <summary>
         /// Watch descriptor
