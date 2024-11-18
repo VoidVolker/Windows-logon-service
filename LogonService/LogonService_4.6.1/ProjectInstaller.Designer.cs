@@ -28,14 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.adsprServiceInstaller = new System.ServiceProcess.ServiceProcessInstaller();
+            this.ServiceInstaller = new System.ServiceProcess.ServiceProcessInstaller();
             this.LogonServiceInstaller = new System.ServiceProcess.ServiceInstaller();
             // 
-            // adsprServiceInstaller
+            // ServiceInstaller
             // 
-            this.adsprServiceInstaller.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
-            this.adsprServiceInstaller.Password = "lsrv";
-            this.adsprServiceInstaller.Username = "lsrv";
+            this.ServiceInstaller.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
+            this.ServiceInstaller.Password = "lsrv";
+            this.ServiceInstaller.Username = "lsrv";
             // 
             // LogonServiceInstaller
             // 
@@ -47,14 +47,14 @@
             // ProjectInstaller
             // 
             this.Installers.AddRange(new System.Configuration.Install.Installer[] {
-            this.adsprServiceInstaller,
+            this.ServiceInstaller,
             this.LogonServiceInstaller});
 
         }
 
         #endregion
 
-        private System.ServiceProcess.ServiceProcessInstaller adsprServiceInstaller;
+        private System.ServiceProcess.ServiceProcessInstaller ServiceInstaller;
         private System.ServiceProcess.ServiceInstaller LogonServiceInstaller;
 
     }

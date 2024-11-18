@@ -1,0 +1,1 @@
+start LogonService.exe /start

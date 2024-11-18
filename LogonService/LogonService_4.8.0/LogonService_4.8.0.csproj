@@ -4,16 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FAC83616-9681-45D0-B15E-407D2059ABCA}</ProjectGuid>
+    <ProjectGuid>{FF02D228-C61A-431B-8EFE-78BCAECB7FC3}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LogonService</RootNamespace>
     <AssemblyName>LogonService</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <AssemblyVersion>1.1.0.67</AssemblyVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <AssemblyVersion>1.2.0.208</AssemblyVersion>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -25,7 +25,8 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationVersion>1.1.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -116,48 +117,67 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.ServiceProcess" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppConfig.cs" />
+    <Compile Include="..\LogonService_4.6.1\AppConfig.cs">
+      <Link>AppConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\LogonService_4.6.1\ApplicationLoader.cs">
+      <Link>ApplicationLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\LogonService_4.6.1\Args.cs">
+      <Link>Args.cs</Link>
+    </Compile>
+    <Compile Include="..\LogonService_4.6.1\LogonUI.cs">
+      <Link>LogonUI.cs</Link>
+    </Compile>
+    <Compile Include="..\LogonService_4.6.1\Native.cs">
+      <Link>Native.cs</Link>
+    </Compile>
+    <Compile Include="..\LogonService_4.6.1\Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
+    <Compile Include="..\LogonService_4.6.1\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\LogonService_4.6.1\ServiceInstaller.cs">
+      <Link>ServiceInstaller.cs</Link>
+    </Compile>
+    <Compile Include="..\LogonService_4.6.1\Util.cs">
+      <Link>Util.cs</Link>
+    </Compile>
+    <Compile Include="..\LogonService_4.6.1\Watchers\ProcWatcher.cs">
+      <Link>Watchers\ProcWatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\LogonService_4.6.1\Watchers\ProcWMI.cs">
+      <Link>Watchers\ProcWMI.cs</Link>
+    </Compile>
     <Compile Include="LService.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="LService.Designer.cs">
       <DependentUpon>LService.cs</DependentUpon>
     </Compile>
-    <Compile Include="ApplicationLoader.cs" />
-    <Compile Include="Args.cs" />
-    <Compile Include="LogonUI.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ProjectInstaller.Designer.cs">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="serviceInstaller.cs" />
-    <Compile Include="util.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="LService.resx">
       <DependentUpon>LService.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectInstaller.resx">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -167,8 +187,11 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
