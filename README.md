@@ -6,7 +6,8 @@ This service is able to run any application on user login screen. I spend severa
 
 ![LogonApplication](https://github.com/VoidVolker/Windows-logon-service/assets/5086438/23dfd564-a8b7-43d2-a96d-3205aa40c341)
 
-# How to use / Как использовать
+# English
+## How to use
 
 1. Download archive for your platform at [Releases](https://github.com/VoidVolker/Windows-logon-service/releases) page
 1. Unzip to `Program files/LogonService` or any other preffered dir
@@ -24,35 +25,17 @@ This service is able to run any application on user login screen. I spend severa
 LogonService.exe -install
 ```
 
-1. Скачать архив для вашей платформы на странице [Releases](https://github.com/VoidVolker/Windows-logon-service/releases)
-1. Распаковать в `Program files/LogonService` или любой другой каталог
-1. Внести настройки в файл конфигурации `LogonService.exe.config`:
-    - `App`, `string` - приложение для запуска, полный путь, оба вида слэшей поддерживаются (`/` или `\`)
-    - `Restart`, `bool` - автоматически перезапускать приложение при его остановке
-    - `RestartLimit`, `uint` - ограничения числа перезапусков приложения, `0` - неограниченное число
-    - `LogEnabled`, `bool` - включить/выключить лог
-    - `LogPath`, `string` - полный путь до лог-файла (по-умолчанию: `<каталог сервиса>/log.txt` - текущий каталог не используется, т.к. для сервисов это будет каталог `system32`)
-    - `Description`, `string` - описание сервиса
-    - `DisplayName`, `string` - название сервиса
-    - `ServiceName`, `string` - системное название сервиса (без пробелов!)
-1. Установить сервис в коммандной строке:
-```cmd
-LogonService.exe -install
-```
-
-# Operating systems support / Поддерживаемые ОС
+## Operating systems support
 
 - Windows 7, 8.1, 10, 11
 
-# Requirements / Требования
+## Requirements
 
 - DotNet 4.6.1, 4.8.0, 4.8.1
 
 What about newer dotNet versions? Until dotNet 4.8.1 support in OS is dropped no migrations is planned. Newer dotNet service requires to install additional dependencies and that makes service heavy without any reason.
 
-Что на счет более новых версии dotNet? До тех пор, пока ОС будут поддерживать dotNet 4.8.1 миграция проекта не планируется. Более новые версии dotNet для разработки сервиса требуют устанавливать дополнительные зависимости, а это утяжелит и усложнит сервис.
-
-# Run multiple applications / Запуск нескольких приложений
+## Run multiple applications
 
 Use next pattern for options naming in configuration file to run any number of applications: `<option><delimiter><application unique id>`.
 Short example: `App Info`, `Restart Info`, `RestartLimit Info` and etc.
@@ -74,6 +57,56 @@ Full example:
 
 Supported delimiters list: ```\t !\\\"#$%&'()*+,-./|:;?[\\]^_`{|}~``` - feel free to use whatever you like.
 
+## Config apply
+
+Logon Service check last write date of configuration and reloads it at start and logon events.
+
+## Available commands
+
+- `-i` `/i` `-install` `/install` - install and start service
+- `-u` `/u` `-uninstall` `/uninstall` - stop and uninstall service
+- `-r` `/r` `-reinstall` `/reinstall` - reinstall service
+- `-s` `/s` `-status` `/status` - service status, possible values: `Stopped` | `StartPending` | `StopPending` | `Running` | `ContinuePending` | `PausePending` | `Paused` | `NotInstalled`
+- `-start` `/start` - start service
+- `-stop` `/stop` - stop service
+- `-restart` `/restart` - restart service
+
+## Security
+
+Run classic applications at logon screen can create security issues - be very attentive when you do that. Run only specific applications at logon screen with limited features. Installed Logon Service doesn't creates new security issue because it can run applications at logon screen - this can be done by any application in system.
+
+# Russian
+
+## Как использовать
+
+1. Скачать архив для вашей платформы на странице [Releases](https://github.com/VoidVolker/Windows-logon-service/releases)
+1. Распаковать в `Program files/LogonService` или любой другой каталог
+1. Внести настройки в файл конфигурации `LogonService.exe.config`:
+    - `App`, `string` - приложение для запуска, полный путь, оба вида слэшей поддерживаются (`/` или `\`)
+    - `Restart`, `bool` - автоматически перезапускать приложение при его остановке
+    - `RestartLimit`, `uint` - ограничения числа перезапусков приложения, `0` - неограниченное число
+    - `LogEnabled`, `bool` - включить/выключить лог
+    - `LogPath`, `string` - полный путь до лог-файла (по-умолчанию: `<каталог сервиса>/log.txt` - текущий каталог не используется, т.к. для сервисов это будет каталог `system32`)
+    - `Description`, `string` - описание сервиса
+    - `DisplayName`, `string` - название сервиса
+    - `ServiceName`, `string` - системное название сервиса (без пробелов!)
+1. Установить сервис в коммандной строке:
+```cmd
+LogonService.exe -install
+```
+
+## Поддерживаемые ОС
+
+- Windows 7, 8.1, 10, 11
+
+## Требования
+
+- DotNet 4.6.1, 4.8.0, 4.8.1
+
+Что на счет более новых версии dotNet? До тех пор, пока ОС будут поддерживать dotNet 4.8.1, миграция проекта не планируется. Более новые версии dotNet для разработки сервиса требуют устанавливать дополнительные зависимости, а это утяжелит и усложнит сервис.
+
+## Запуск нескольких приложений
+
 Используйте следующий паттерн в файле настроек для запуска нескольких приложений: `<настройка><разделитель><уникальный идентификатор приложения>`.
 Краткий пример: `App Info`, `Restart Info`, `RestartLimit Info` и т.д.
 Полный пример:
@@ -94,23 +127,11 @@ Supported delimiters list: ```\t !\\\"#$%&'()*+,-./|:;?[\\]^_`{|}~``` - feel fre
 
 Список поддерживаемых разделителей: ```\t !\\\"#$%&'()*+,-./|:;?[\\]^_`{|}~``` - используйте любой по вашему вкусу.
 
-# Config apply / Применение настроек
-
-Logon Service check last write date of configuration and reloads it at start and logon events.
+## Применение настроек
 
 Сервис в момент запуска и активации экрана входа проверяет дату изменения файла конфигурации и подгружает изменения в память.
 
-# Available commands / Доступные команды
-
-- `-i` `/i` `-install` `/install` - install and start service
-- `-u` `/u` `-uninstall` `/uninstall` - stop and uninstall service
-- `-r` `/r` `-reinstall` `/reinstall` - reinstall service
-- `-s` `/s` `-status` `/status` - service status, possible values: `Stopped` | `StartPending` | `StopPending` | `Running` | `ContinuePending` | `PausePending` | `Paused` | `NotInstalled`
-- `-start` `/start` - start service
-- `-stop` `/stop` - stop service
-- `-restart` `/restart` - restart service
-
-
+## Доступные команды
 
 - `-i` `/i` `-install` `/install` - устанвоить и запустить сервис
 - `-u` `/u` `-uninstall` `/uninstall` - остановить и удалить сервис
@@ -120,9 +141,7 @@ Logon Service check last write date of configuration and reloads it at start and
 - `-stop` `/stop` - остановить сервис
 - `-restart` `/restart` - перезапустить сервис
 
-# Security / Безопасность
-
-Run classic applications at logon screen can create security issues - be very attentive when you do that. Run only specific applications at logon screen with limited features. Installed Logon Service doesn't creates new security issue because it can run applications at logon screen - this can be done by any application in system.
+## Безопасность
 
 Запуск классических приложений на экране входа может создать угрозу безопасности системы - будьте аккуратны в выборе запускаемых приложений. Рекомендуется запускать приложения только с ограничениями. Установленный сервис не создаёт дополнительных угроз безопасности системы - используются стандартные вызовы WinAPI, которые могут быть использованы любым приложением в системе.
 
