@@ -110,6 +110,8 @@ Logon Service check last write date of configuration and reloads it at start and
 - `-stop` `/stop` - stop service
 - `-restart` `/restart` - restart service
 
+
+
 - `-i` `/i` `-install` `/install` - устанвоить и запустить сервис
 - `-u` `/u` `-uninstall` `/uninstall` - остановить и удалить сервис
 - `-r` `/r` `-reinstall` `/reinstall` - переустановить сервис
