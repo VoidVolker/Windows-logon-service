@@ -30,11 +30,12 @@ namespace LogonService
         {
             //isConsole = isCon;
             InitializeComponent();
+            // Reload config
+            AppConfig.LoadIfUpdated();
+
             eventLog.Source = AppConfig.ServiceName;
             ServiceName = AppConfig.ServiceName;
 
-            // Reload config
-            AppConfig.LoadIfUpdated();
             // Subscribe to events
             ProcWatcher.OnStart(LogonUI.ProcFullName, LogonUIStarted);
             ProcWatcher.OnStop(LogonUI.ProcFullName, LogonUIStopped);
@@ -49,7 +50,10 @@ namespace LogonService
             Process proc = Process.GetProcessById((int)pid);
             string procPath = proc.MainModule.FileName;
             // Check process full path
-            if (!procPath.Equals(LogonUI.ProcPath, StringComparison.OrdinalIgnoreCase)) { return; }
+            if (!procPath.Equals(LogonUI.ProcPath, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
 
             // Save pid to catch stopping exactly this process (for rare case when user runs random app with same name)
             LogonPid = (uint)proc.Id;
@@ -100,7 +104,7 @@ namespace LogonService
             app.ProcInfo = new ApplicationLoader.PROCESS_INFORMATION();
 
             // Try process start
-            if (ApplicationLoader.StartProcessAndBypassUAC(app.Path, out app.ProcInfo))
+            if (ApplicationLoader.StartProcessAndBypassUAC(app.Command, out app.ProcInfo))
             {
                 Log($"[STARTED] [{app.Id}] process/thread IDs: {app.ProcInfo.dwProcessId}/{app.ProcInfo.dwThreadId}");
                 if (app.IsRestart)
@@ -143,7 +147,8 @@ namespace LogonService
             {
                 app.RestartCounter = 0;
 
-                if (EqualityComparer<ApplicationLoader.PROCESS_INFORMATION>.Default.Equals(app.ProcInfo, default)) { continue; }
+                if (EqualityComparer<ApplicationLoader.PROCESS_INFORMATION>.Default.Equals(app.ProcInfo, default))
+                { continue; }
 
                 if (Util.TryProc((int)app.ProcInfo.dwProcessId) is Process proc)
                 {

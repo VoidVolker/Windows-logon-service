@@ -12,14 +12,15 @@ This service is able to run any application on user login screen. I spend severa
 1. Download archive for your platform at [Releases](https://github.com/VoidVolker/Windows-logon-service/releases) page
 1. Unzip to `Program files/LogonService` or any other preffered dir
 1. Edit configuration file `LogonService.exe.config`:
-    - `App`, `string` - aplication to run at logon screen, full file path, both slash and backslash is supported (`/` or `\`)
-    - `Restart`, `bool` - watch to app stop event and restart application if it was closed
-    - `RestartLimit`, `uint` - application restarts limit, when it reached Logon Service will stop restarting application, `0` - no limit
-    - `LogEnabled`, `bool` - turn on/off logging
-    - `LogPath`, `string` - full file path to log file (default: `<exe dir>/log.txt` - not current dir, because for service it will be `system32`)
-    - `Description`, `string` - service description
-    - `DisplayName`, `string` - service display name
-    - `ServiceName`, `string` - service system level name (no spaces!)
+    - `App`, `string`, required, - aplication to run at logon screen, full file path, both slash and backslash is supported (`/` or `\`)
+    - `App.Arguments`, `string`, optional - application arguments, use single quotes for parameter and double quotes to split arguments with spaces, if no spaces in arguments - use space as argument delimiter and default double quotes for full option string
+    - `App.Restart`, `bool`, optional - watch to app stop event and restart application if it was closed, default - `false`
+    - `App.RestartLimit`, `uint`, optional - application restarts limit, when it reached Logon Service will stop restarting application, `0` - no limit, default - `10`
+    - `LogEnabled`, `bool`, optional - turn on/off logging, default - `false`
+    - `LogPath`, `string`, optional - full file path to log file (default: `<exe dir>/log.txt` - not current dir, because for service it will be `system32`)
+    - `Description`, `string`, optional - service description
+    - `DisplayName`, `string`, optional - service display name
+    - `ServiceName`, `string`, optional - service system level name (no spaces!)
 1. Install service in command line:
 ```cmd
 LogonService.exe -install
@@ -38,20 +39,22 @@ What about newer dotNet versions? Until dotNet 4.8.1 support in OS is dropped no
 ## Run multiple applications
 
 Use next pattern for options naming in configuration file to run any number of applications: `<option><delimiter><application unique id>`.
-Short example: `App Info`, `Restart Info`, `RestartLimit Info` and etc.
+Short example: `App Info`, `App.Arguments Info`, `App.Restart Info`, `App.RestartLimit Info` and etc.
 Full example:
 ```xml
 <add key="App Info"
-     value="C:\adm\info.exe"/>
-<add key="Watch Info"
+     value="C:\adm\LockScreenText.exe"/>
+<add key="App.Arguments Info"
+     value='"-postion top-left" "-time HH:mm:ss" -pcname'/>
+<add key="App.Restart Info"
      value="true"/>
-<add key="RestartLimit Info"
+<add key="App.RestartLimit Info"
      value="100"/>
 <add key="App Password recovery"
      value="C:\adm\pwdrecovery.exe"/>
-<add key="Watch Password recovery"
+<add key="App.Restart Password recovery"
      value="true"/>
-<add key="RestartLimit Password recovery"
+<add key="App.RestartLimit Password recovery"
      value="0"/>
 ```
 
@@ -75,6 +78,8 @@ Logon Service check last write date of configuration and reloads it at start and
 
 Run classic applications at logon screen can create security issues - be very attentive when you do that. Run only specific applications at logon screen with limited features. Installed Logon Service doesn't creates new security issue because it can run applications at logon screen - this can be done by any application in system.
 
+---
+
 # Russian
 
 ## Как использовать
@@ -82,14 +87,15 @@ Run classic applications at logon screen can create security issues - be very at
 1. Скачать архив для вашей платформы на странице [Releases](https://github.com/VoidVolker/Windows-logon-service/releases)
 1. Распаковать в `Program files/LogonService` или любой другой каталог
 1. Внести настройки в файл конфигурации `LogonService.exe.config`:
-    - `App`, `string` - приложение для запуска, полный путь, оба вида слэшей поддерживаются (`/` или `\`)
-    - `Restart`, `bool` - автоматически перезапускать приложение при его остановке
-    - `RestartLimit`, `uint` - ограничения числа перезапусков приложения, `0` - неограниченное число
-    - `LogEnabled`, `bool` - включить/выключить лог
-    - `LogPath`, `string` - полный путь до лог-файла (по-умолчанию: `<каталог сервиса>/log.txt` - текущий каталог не используется, т.к. для сервисов это будет каталог `system32`)
-    - `Description`, `string` - описание сервиса
-    - `DisplayName`, `string` - название сервиса
-    - `ServiceName`, `string` - системное название сервиса (без пробелов!)
+    - `App`, `string`, обязательно - приложение для запуска, полный путь, оба вида слэшей поддерживаются (`/` или `\`)    
+    - `App.Arguments`, `string`, опционально - аргументы приложения, дляпередачи аргументов с пробелами используйте одинарные кавычки для опции и двойные кавычки для самих аргументов, если в аргументах нет пробелов - то используйте пробел для разделения аргументов и стандартные двойные кавычки для всей строки опции
+    - `App.Restart`, `bool`, опционально - автоматически перезапускать приложение при его остановке, по умолчанию - `false`
+    - `App.RestartLimit`, `uint`, опционально - ограничения числа перезапусков приложения, `0` - неограниченное число, по умолчанию - `10`
+    - `LogEnabled`, `bool`, опционально - включить/выключить лог, по умолчанию - `false`
+    - `LogPath`, `string`, опционально - полный путь до лог-файла (по-умолчанию: `<каталог сервиса>/log.txt` - текущий каталог не используется, т.к. для сервисов это будет каталог `system32`)
+    - `Description`, `string`, опционально - описание сервиса
+    - `DisplayName`, `string`, опционально - название сервиса
+    - `ServiceName`, `string`, опционально - системное название сервиса (без пробелов!)
 1. Установить сервис в коммандной строке:
 ```cmd
 LogonService.exe -install
@@ -108,20 +114,22 @@ LogonService.exe -install
 ## Запуск нескольких приложений
 
 Используйте следующий паттерн в файле настроек для запуска нескольких приложений: `<настройка><разделитель><уникальный идентификатор приложения>`.
-Краткий пример: `App Info`, `Restart Info`, `RestartLimit Info` и т.д.
+Краткий пример: `App Info`, `App.Arguments Info`, `App.Restart Info`, `App.RestartLimit Info` и т.д.
 Полный пример:
 ```xml
 <add key="App Info"
-     value="C:\adm\info.exe"/>
-<add key="Watch Info"
+     value="C:\adm\LockScreenText.exe"/>
+<add key="App.Arguments Info"
+     value='-pcname "-time HH:mm:ss"'/>
+<add key="App.Restart Info"
      value="true"/>
-<add key="RestartLimit Info"
+<add key="App.RestartLimit Info"
      value="100"/>
 <add key="App Password recovery"
      value="C:\adm\pwdrecovery.exe"/>
-<add key="Watch Password recovery"
+<add key="App.Restart Password recovery"
      value="true"/>
-<add key="RestartLimit Password recovery"
+<add key="App.RestartLimit Password recovery"
      value="0"/>
 ```
 
@@ -133,7 +141,7 @@ LogonService.exe -install
 
 ## Доступные команды
 
-- `-i` `/i` `-install` `/install` - устанвоить и запустить сервис
+- `-i` `/i` `-install` `/install` - установить и запустить сервис
 - `-u` `/u` `-uninstall` `/uninstall` - остановить и удалить сервис
 - `-r` `/r` `-reinstall` `/reinstall` - переустановить сервис
 - `-s` `/s` `-status` `/status` - статус сервиса, возможные значения: `Stopped` | `StartPending` | `StopPending` | `Running` | `ContinuePending` | `PausePending` | `Paused` | `NotInstalled`

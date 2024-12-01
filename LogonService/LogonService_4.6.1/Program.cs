@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 
 namespace LogonService
 {
-    static class Program
+    public static class Program
     {
         /// <summary>
         /// Главная точка входа для приложения.

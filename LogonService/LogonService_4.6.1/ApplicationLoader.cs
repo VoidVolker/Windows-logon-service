@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace LogonService
 {
-    class ApplicationLoader
+    public class ApplicationLoader
     {
         #region Structures
 

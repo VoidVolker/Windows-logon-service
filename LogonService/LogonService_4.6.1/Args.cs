@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.ServiceProcess;
@@ -10,6 +9,7 @@ namespace LogonService
     public static class Args
     {
         private const string NotInstalled = "NotInstalled";
+        private static TimeSpan ServiceTimeout = TimeSpan.FromSeconds(10);
 
         public static void Parse(
             string[] args,
@@ -128,7 +128,8 @@ namespace LogonService
 
         private static bool IfNotInstalledWarning(bool isInstalled, string operation)
         {
-            if (!isInstalled) { Console.WriteLine($"Failed to {operation} service: service not installed"); }
+            if (!isInstalled)
+            { Console.WriteLine($"Failed to {operation} service: service not installed"); }
             return isInstalled;
         }
 
@@ -146,7 +147,10 @@ namespace LogonService
         {
             install();
             //Util.NetStartService(serviceName);
-            new ServiceController(AppConfig.ServiceName).Start();
+            ServiceController service = new ServiceController(AppConfig.ServiceName);
+            service.Start();
+            service.WaitForStatus(ServiceControllerStatus.Running, ServiceTimeout);
+
             Console.WriteLine("Service installed and started");
         }
 
@@ -158,9 +162,11 @@ namespace LogonService
             if (service.Status == ServiceControllerStatus.Running)
             {
                 service.Stop();
+                service.WaitForStatus(ServiceControllerStatus.Stopped, ServiceTimeout);
             }
 
             uninstall();
+
             Console.WriteLine("Service stopped and uninstalled");
         }
 
@@ -172,6 +178,7 @@ namespace LogonService
             if (service.Status == ServiceControllerStatus.Running)
             {
                 service.Stop();
+                service.WaitForStatus(ServiceControllerStatus.Stopped, ServiceTimeout);
             }
 
             uninstall();
@@ -179,6 +186,8 @@ namespace LogonService
 
             //Util.NetStartService(serviceName);
             service.Start();
+            service.WaitForStatus(ServiceControllerStatus.Running, ServiceTimeout);
+
             Console.WriteLine("Service stopped, reinstalled and started");
         }
 
@@ -193,6 +202,8 @@ namespace LogonService
 
             //Util.NetStartService(serviceName);
             service.Start();
+            service.WaitForStatus(ServiceControllerStatus.Running, ServiceTimeout);
+
             Console.WriteLine("Service started");
         }
 
@@ -206,6 +217,8 @@ namespace LogonService
 
             //Util.NetStopService(serviceName);
             service.Stop();
+            service.WaitForStatus(ServiceControllerStatus.Stopped, ServiceTimeout);
+
             Console.WriteLine("Service stopped");
         }
 
@@ -218,7 +231,8 @@ namespace LogonService
             }
 
             service.Stop();
-            service.Refresh();
+            service.WaitForStatus(ServiceControllerStatus.Stopped, ServiceTimeout);
+            //service.Refresh();
 
             if (service.Status != ServiceControllerStatus.Stopped)
             {
@@ -230,6 +244,8 @@ namespace LogonService
             //Util.NetStartService(serviceName);
 
             service.Start();
+            service.WaitForStatus(ServiceControllerStatus.Running, ServiceTimeout);
+
             Console.WriteLine("Service restarted");
         }
 

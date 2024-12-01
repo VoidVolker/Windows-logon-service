@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using IO = System.IO;
 using System.Linq;
+
+using IO = System.IO;
 
 namespace LogonService
 {
+
     /// <summary>
     /// Application configuration
     /// </summary>
-    internal static class AppConfig
+    public static class AppConfig
     {
         private static readonly string defaultLogPath = IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log.txt");
-        // Delimiters list for application id
-        private static readonly string delimiters = "\t !\\\"#$%&'()*+,-./|:;?[\\]^_`{|}~";
+        //// Delimiters list for application id
+        //private static readonly string delimiters = "\t !\\\"#$%&'()*+,-./|:;?[\\]^_`{|}~";
+        private static readonly string idDelimiters = " ";
 
         // Options
         public static App[] Apps = new App[0];
@@ -46,7 +49,7 @@ namespace LogonService
             ConfigurationManager.RefreshSection("appSettings");
 
             // Load values from config
-            Apps = GetApps("App", "Restart", "RestartLimit");
+            Apps = GetApps("App", "Arguments", "Restart", "RestartLimit");
             bool.TryParse(Get("LogEnabled", "false"), out IsLogEnabled);
             LogPath = GetPath("LogPath", defaultLogPath);
             Description = Get("Description", "Logon Service for running applications on logon screen");
@@ -57,14 +60,15 @@ namespace LogonService
         public static string Get(string prop, string defProp = null)
         {
             string value = ConfigurationManager.AppSettings[prop];
-            return string.IsNullOrEmpty(value) ? defProp : value;
+            return string.IsNullOrWhiteSpace(value) ? defProp : value;
         }
 
         public static string GetPath(string prop, string defProp = null)
         {
             string value = ConfigurationManager.AppSettings[prop];
 
-            if (string.IsNullOrEmpty(value)) { return defProp; }
+            if (string.IsNullOrWhiteSpace(value))
+            { return defProp; }
             try
             {
                 return IO.Path.GetFullPath(value);
@@ -78,40 +82,40 @@ namespace LogonService
 
         public static Dictionary<string, string> GetArrayStartsWith(string prop)
         {
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            int propLen = prop.Length;
             // Get target property keys and values
-            IEnumerable<string> list = ConfigurationManager.AppSettings.AllKeys
-               .Where(key => key.StartsWith(prop));
-
-            // Extract id from key and convert list to dictionary
-            Dictionary<string, string> dict = list.ToDictionary(
+            ConfigurationManager.AppSettings.AllKeys
+                .Where(key => key.StartsWith(prop))
+                // Extract id from key and convert list to dictionary
+                .Each(
                 key =>
                 {
                     // Key contains additional ID?
-                    if (key.Length > prop.Length)
+                    if (key.Length > propLen)
                     {
-                        // Delimeter or id position
-                        int idPos = prop.Length;
-                        // If key contains delimeter - remove it from key too
-                        if (delimiters.Contains(key[idPos])) { idPos++; }
-                        // Get id from key
-                        return key.Remove(0, idPos);
+                        // Key contains delimeter after prop end?
+                        if (idDelimiters.Contains(key[propLen]))
+                        {
+                            string k = key.Remove(0, propLen + 1);
+                            result[k] = ConfigurationManager.AppSettings[key];
+                        }
                     }
-                    else
+                    else // No Id added
                     {
-                        // Property doesn't contains any additional id and this is just one key-value pair
-                        return string.Empty;
+                        result[string.Empty] = ConfigurationManager.AppSettings[key];
                     }
-                },
-                k => ConfigurationManager.AppSettings[k]);
+                });
 
-            return dict;
+            return result;
         }
 
-        public static App[] GetApps(string appKey, string watchKey, string limitKey)
+        public static App[] GetApps(string appKey, string argsKey, string watchKey, string limitKey)
         {
             Dictionary<string, string> paths = GetArrayStartsWith(appKey);
-            Dictionary<string, string> watchFlags = GetArrayStartsWith(watchKey);
-            Dictionary<string, string> limits = GetArrayStartsWith(limitKey);
+            Dictionary<string, string> allArgs = GetArrayStartsWith($"{appKey}.{argsKey}");
+            Dictionary<string, string> watchFlags = GetArrayStartsWith($"{appKey}.{watchKey}");
+            Dictionary<string, string> limits = GetArrayStartsWith($"{appKey}.{limitKey}");
             List<App> apps = new List<App>();
             int i = 0;
 
@@ -120,11 +124,12 @@ namespace LogonService
                 // Get app id and path options values
                 string id = p.Key == appKey ? IO.Path.GetFileNameWithoutExtension(p.Value) : p.Key // One app case - id is 
                     , path = p.Value
+                    , args = string.Empty
                     , watch = string.Empty
                     , limit = string.Empty;
 
                 // Get app watch and limit options values
-                if (string.IsNullOrEmpty(id)) // No app ID provided
+                if (string.IsNullOrWhiteSpace(id)) // No app ID provided
                 {
                     if (watchFlags.Count < i)
                     {
@@ -134,18 +139,23 @@ namespace LogonService
                     {
                         limit = limits.ElementAt(i).Value;
                     }
+                    if (allArgs.Count < i)
+                    {
+                        args = allArgs.ElementAt(i).Value;
+                    }
                 }
                 else
                 {
+                    allArgs.TryGetValue(id, out args);
                     watchFlags.TryGetValue(id, out watch);
                     limits.TryGetValue(id, out limit);
                 }
 
                 // Ignore empty path apps
-                if (string.IsNullOrEmpty(path)) { continue; }
+                if (string.IsNullOrWhiteSpace(path)) { continue; }
 
                 // Check if app file exists
-                if (!IO.File.Exists(path))
+                if (string.IsNullOrWhiteSpace(path) || !IO.File.Exists(path))
                 {
                     LogError($"Error while parsing path in property '{appKey}' -> '{id}' with value '{path}'. Error: file not found.");
                     continue;
@@ -154,11 +164,12 @@ namespace LogonService
                 // One app case - id is missing in config
                 if (id == appKey)
                 {
+                    // Use file name as id
                     id = IO.Path.GetFileNameWithoutExtension(path);
                 }
 
                 // Create app descriptor
-                App app = new App(id, path, watch, limit);
+                App app = new App(id, path, args, watch, limit);
                 // Push app to array
                 apps.Add(app);
             }
@@ -204,6 +215,10 @@ namespace LogonService
             /// </summary>
             public readonly string Path = string.Empty;
             /// <summary>
+            /// Command to execute
+            /// </summary>
+            public readonly string Command = string.Empty;
+            /// <summary>
             /// Watch application stop and restart or not
             /// </summary>
             public readonly bool IsRestart = false;
@@ -221,16 +236,18 @@ namespace LogonService
             /// </summary>
             public ApplicationLoader.PROCESS_INFORMATION ProcInfo;
 
-            public App(string id, string path, string watch, string limit)
+            public App(string id, string path, string args, string watch, string limit)
             {
                 Path = IO.Path.GetFullPath(path);
                 File = IO.Path.GetFileName(path);
                 // Id or short file name
-                Id = string.IsNullOrEmpty(id)
+                Id = string.IsNullOrWhiteSpace(id)
                     ? IO.Path.GetFileNameWithoutExtension(File)
                     : id;
                 bool.TryParse(watch, out IsRestart);
                 uint.TryParse(limit, out RestartLimit);
+
+                Command = string.IsNullOrWhiteSpace(args) ? Path : $"\"{Path}\" {args}";
             }
 
             public override string ToString() => Id;

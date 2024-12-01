@@ -116,5 +116,35 @@ namespace LogonService
             public string Output { get; internal set; }
             public string Error { get; internal set; }
         }
+
+        public static IEnumerable<T> Each<T>(this IEnumerable<T> list, Action<T> action)
+        {
+            foreach (T item in list) { action(item); }
+            return list;
+        }
+
+        public static IEnumerable<KeyValuePair<K, V>> Each<K, V>(
+            this IEnumerable<KeyValuePair<K, V>> dict,
+            Action<K, V> action
+        )
+        {
+            foreach (KeyValuePair<K, V> kv in dict) { action(kv.Key, kv.Value); }
+            return dict;
+        }
+
+        public static IDictionary<K, V> RemoveAll<K, V>(
+            this IDictionary<K, V> dict,
+            IEnumerable<K> keys
+        )
+        {
+            foreach (K key in keys) { dict.Remove(key); }
+            return dict;
+        }
+
+        public static void Deconstruct<T>(this T[] items, out T t0, out T t1)
+        {
+            t0 = items.Length > 0 ? items[0] : default;
+            t1 = items.Length > 1 ? items[1] : default;
+        }
     }
 }
