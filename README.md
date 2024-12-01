@@ -120,7 +120,7 @@ LogonService.exe -install
 <add key="App Info"
      value="C:\adm\LockScreenText.exe"/>
 <add key="App.Arguments Info"
-     value='-pcname "-time HH:mm:ss"'/>
+     value='"-postion top-left" "-time HH:mm:ss" -pcname'/>
 <add key="App.Restart Info"
      value="true"/>
 <add key="App.RestartLimit Info"
