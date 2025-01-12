@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.ServiceProcess;
 using System.Text;
 
@@ -8,11 +7,16 @@ namespace LogonService
 {
     public static class Program
     {
+        #region Private Methods
+
         /// <summary>
         /// Главная точка входа для приложения.
         /// </summary>
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
+            // Set current directory to application location path
+            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
             try
             {
                 AppConfig.LoadIfUpdated();
@@ -69,5 +73,6 @@ namespace LogonService
             );
         }
 
+        #endregion Private Methods
     }
 }

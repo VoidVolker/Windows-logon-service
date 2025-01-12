@@ -15,11 +15,7 @@ namespace LogonService
     {
         //Created via constructor and added some specific options wich I don't remember :(
 
-        private readonly ProcWMI ProcWatcher = new ProcWMI();
-        private readonly bool IsConsole = false;
-
-        // LogonUI process ID - required for catching it's stop
-        private uint LogonPid = 0;
+        #region Public Constructors
 
         public LService(bool isConsole) : this()
         {
@@ -30,6 +26,7 @@ namespace LogonService
         {
             //isConsole = isCon;
             InitializeComponent();
+
             // Reload config
             AppConfig.LoadIfUpdated();
 
@@ -39,6 +36,77 @@ namespace LogonService
             // Subscribe to events
             ProcWatcher.OnStart(LogonUI.ProcFullName, LogonUIStarted);
             ProcWatcher.OnStop(LogonUI.ProcFullName, LogonUIStopped);
+        }
+
+        #endregion Public Constructors
+
+        #region Private Fields
+
+        private readonly bool IsConsole = false;
+        private readonly ProcWMI ProcWatcher = new ProcWMI();
+
+        // LogonUI process ID - required for catching it's stop
+        private uint LogonPid = 0;
+
+        #endregion Private Fields
+
+        #region Public Methods
+
+        public void LogonServiceStart()
+        {
+            ProcWatcher.Start();
+            Log("[STARTED]");
+        }
+
+        public void LogonServiceStop()
+        {
+            ProcWatcher.Stop();
+            StopApps();
+            Log("[STOPPED]");
+        }
+
+        #endregion Public Methods
+
+        #region Protected Methods
+
+        protected override void OnShutdown()
+        {
+            LogonServiceStop();
+            Stop();
+            base.OnShutdown();
+        }
+
+        protected override void OnStart(string[] args)
+        {
+            LogonServiceStart();
+            base.OnStart(args);
+        }
+
+        protected override void OnStop()
+        {
+            LogonServiceStop();
+            base.OnStop();
+        }
+
+        #endregion Protected Methods
+
+        #region Private Methods
+
+        private void Log(string str) => AppConfig.Log(IsConsole, str);
+
+        private void LogonMode()
+        {
+            // Logon session mode
+            Log("[LOGON MODE]");
+
+            // Reload config
+            AppConfig.LoadIfUpdated();
+
+            // Run applications
+            foreach (AppConfig.App app in AppConfig.Apps)
+            {
+                RunApp(app);
+            }
         }
 
         private void LogonUIStarted(uint pid, ProcEventArgs ev)
@@ -67,21 +135,6 @@ namespace LogonService
 
             LogonPid = 0;
             UserMode();
-        }
-
-        private void LogonMode()
-        {
-            // Logon session mode
-            Log("[LOGON MODE]");
-
-            // Reload config
-            AppConfig.LoadIfUpdated();
-
-            // Run applications
-            foreach (AppConfig.App app in AppConfig.Apps)
-            {
-                RunApp(app);
-            }
         }
 
         private void RunApp(AppConfig.App app)
@@ -133,13 +186,6 @@ namespace LogonService
             }
         }
 
-        private void UserMode()
-        {
-            // User session mode
-            Log("[USER MODE]");
-            StopApps();
-        }
-
         private void StopApps()
         {
             // Try kill all running apps
@@ -160,38 +206,13 @@ namespace LogonService
             }
         }
 
-        private void Log(string str) => AppConfig.Log(IsConsole, str);
-
-        public void LogonServiceStart()
+        private void UserMode()
         {
-            ProcWatcher.Start();
-            Log("[STARTED]");
-        }
-
-        public void LogonServiceStop()
-        {
-            ProcWatcher.Stop();
+            // User session mode
+            Log("[USER MODE]");
             StopApps();
-            Log("[STOPPED]");
         }
 
-        protected override void OnStart(string[] args)
-        {
-            LogonServiceStart();
-            base.OnStart(args);
-        }
-
-        protected override void OnStop()
-        {
-            LogonServiceStop();
-            base.OnStop();
-        }
-
-        protected override void OnShutdown()
-        {
-            LogonServiceStop();
-            Stop();
-            base.OnShutdown();
-        }
+        #endregion Private Methods
     }
 }

@@ -1,15 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.ServiceProcess;
 
 namespace LogonService
 {
     public static class Args
     {
+        #region Private Fields
+
         private const string NotInstalled = "NotInstalled";
         private static TimeSpan ServiceTimeout = TimeSpan.FromSeconds(10);
+
+        #endregion Private Fields
+
+        #region Public Methods
 
         public static void Parse(
             string[] args,
@@ -79,6 +87,11 @@ namespace LogonService
                             }
                             break;
 
+                        case "version":
+                        case "v":
+                            ShowVersion();
+                            break;
+
                         default:
                             ShowHelp(args);
                             break;
@@ -108,23 +121,9 @@ namespace LogonService
             //}
         }
 
-        private static bool IsCommand(string[] args, out string command)
-        {
-            if (
-                args != null &&
-                args.Length == 1 &&
-                args[0].Length > 1)
-            {
-                char dl = args[0][0];
-                if (dl == '-' || dl == '/' || dl == '\\' || dl == '|')
-                {
-                    command = args[0].Substring(1).ToLower(); // Drop delimiter
-                    return true;
-                }
-            }
-            command = string.Empty;
-            return false;
-        }
+        #endregion Public Methods
+
+        #region Private Methods
 
         private static bool IfNotInstalledWarning(bool isInstalled, string operation)
         {
@@ -143,6 +142,24 @@ namespace LogonService
             return false;
         }
 
+        private static bool IsCommand(string[] args, out string command)
+        {
+            if (
+                args != null &&
+                args.Length == 1 &&
+                args[0].Length > 1)
+            {
+                char dl = args[0][0];
+                if (dl == '-' || dl == '/' || dl == '\\' || dl == '|')
+                {
+                    command = args[0].Substring(1).ToLower(); // Drop delimiter
+                    return true;
+                }
+            }
+            command = string.Empty;
+            return false;
+        }
+
         private static void ServiceInstall(Action install)
         {
             install();
@@ -152,22 +169,6 @@ namespace LogonService
             service.WaitForStatus(ServiceControllerStatus.Running, ServiceTimeout);
 
             Console.WriteLine("Service installed and started");
-        }
-
-        private static void ServiceUninstall(Action uninstall)
-        {
-            //Util.NetStopService(serviceName);
-            ServiceController service = new ServiceController(AppConfig.ServiceName);
-
-            if (service.Status == ServiceControllerStatus.Running)
-            {
-                service.Stop();
-                service.WaitForStatus(ServiceControllerStatus.Stopped, ServiceTimeout);
-            }
-
-            uninstall();
-
-            Console.WriteLine("Service stopped and uninstalled");
         }
 
         private static void ServiceReinstall(Action install, Action uninstall)
@@ -191,6 +192,32 @@ namespace LogonService
             Console.WriteLine("Service stopped, reinstalled and started");
         }
 
+        private static void ServiceRestart()
+        {
+            ServiceController service = new ServiceController(AppConfig.ServiceName);
+            if (service.Status != ServiceControllerStatus.Running)
+            {
+                Console.WriteLine($"Failed to stop service: service isn't running. State: {service.Status}");
+            }
+
+            service.Stop();
+            service.WaitForStatus(ServiceControllerStatus.Stopped, ServiceTimeout);
+            //service.Refresh();
+
+            if (service.Status != ServiceControllerStatus.Stopped)
+            {
+                Console.WriteLine($"Failed to start service: service isn't stopped. State: {service.Status}");
+                return;
+            }
+
+            //Util.NetStopService(serviceName);
+            //Util.NetStartService(serviceName);
+
+            service.Start();
+            service.WaitForStatus(ServiceControllerStatus.Running, ServiceTimeout);
+
+            Console.WriteLine("Service restarted");
+        }
 
         private static void ServiceStart()
         {
@@ -222,31 +249,59 @@ namespace LogonService
             Console.WriteLine("Service stopped");
         }
 
-        private static void ServiceRestart()
+        private static void ServiceUninstall(Action uninstall)
         {
-            ServiceController service = new ServiceController(AppConfig.ServiceName);
-            if (service.Status != ServiceControllerStatus.Running)
-            {
-                Console.WriteLine($"Failed to stop service: service isn't running. State: {service.Status}");
-            }
-
-            service.Stop();
-            service.WaitForStatus(ServiceControllerStatus.Stopped, ServiceTimeout);
-            //service.Refresh();
-
-            if (service.Status != ServiceControllerStatus.Stopped)
-            {
-                Console.WriteLine($"Failed to start service: service isn't stopped. State: {service.Status}");
-                return;
-            }
-
             //Util.NetStopService(serviceName);
-            //Util.NetStartService(serviceName);
+            ServiceController service = new ServiceController(AppConfig.ServiceName);
 
-            service.Start();
-            service.WaitForStatus(ServiceControllerStatus.Running, ServiceTimeout);
+            if (service.Status == ServiceControllerStatus.Running)
+            {
+                service.Stop();
+                service.WaitForStatus(ServiceControllerStatus.Stopped, ServiceTimeout);
+            }
 
-            Console.WriteLine("Service restarted");
+            uninstall();
+
+            Console.WriteLine("Service stopped and uninstalled");
+        }
+
+        private static void ShowHelp(string[] args)
+        {
+            // Define help header
+            string helpCommandMessage = string.Empty;
+            if (args.Length > 1)
+            {
+                //helpCommandMessage = "No command line arguments founded.";
+                //}
+                //else
+                //{
+                // Combine arguments list to one string
+                string arguments = string.Join("\n", args);
+                helpCommandMessage = $"Unrecognized command line arguments:\n{arguments}\n\n";
+            }
+
+            // Get statuses list
+            List<string> statuses = Enum.GetNames(typeof(ServiceControllerStatus)).ToList();
+            // Add "NotInstalled" status
+            statuses.Add(NotInstalled);
+            // Combine to one string
+            string serviceStates = string.Join(" | ", statuses);
+
+            Console.Write("Version: ");
+            ShowVersion();
+
+            // Show help:
+            Console.WriteLine(helpCommandMessage +
+                "Available commands:\n" +
+                "    -i /i -install /install — install and start service\n" +
+                "    -u /u -uninstall /uninstall — stop and uninstall service\n" +
+                "    -r /r -reinstall /reinstall — reinstall service\n" +
+                $"    -s /s -status /status — service status, possible values: {serviceStates}\n" +
+                "    -start /start — start service\n" +
+                "    -stop /stop — stop service\n" +
+                "    -restart /restart — restart service\n" +
+                "    -v /v -version /version — return application version\n"
+            );
         }
 
         private static void ShowStatus(bool isInstalled)
@@ -261,40 +316,11 @@ namespace LogonService
             }
         }
 
-        private static void ShowHelp(string[] args)
+        private static void ShowVersion()
         {
-            // Define help header
-            string helpCommandMessage;
-            if (args.Length == 0)
-            {
-                helpCommandMessage = "No command line arguments founded.";
-            }
-            else
-            {
-                // Combine arguments list to one string
-                string arguments = string.Join("\n", args);
-                helpCommandMessage = $"Unrecognized command line arguments:\n{arguments}\n\n";
-            }
-
-            // Get statuses list
-            List<string> statuses = Enum.GetNames(typeof(ServiceControllerStatus)).ToList();
-            // Add "NotInstalled" status
-            statuses.Add(NotInstalled);
-            // Combine to one string
-            string serviceStates = string.Join(" | ", statuses);
-
-            // Show help:
-            Console.WriteLine(helpCommandMessage +
-                " Available commands:\n" +
-                "    -i /i -install /install — install and start service\n" +
-                "    -u /u -uninstall /uninstall — stop and uninstall service\n" +
-                "    -r /r -reinstall /reinstall — reinstall service\n" +
-                $"    -s /s -status /status — service status, possible values: {serviceStates}\n" +
-                "    -start /start — start service\n" +
-                "    -stop /stop — stop service\n" +
-                "    -restart /restart — restart service\n"
-            );
+            Console.WriteLine(FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion);
         }
 
+        #endregion Private Methods
     }
 }

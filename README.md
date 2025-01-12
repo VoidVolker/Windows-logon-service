@@ -1,18 +1,19 @@
 # Windows Logon service
 
-This service is able to run any application on user login screen. I spend several weeks to collect all solutions from internet into one working project. Using specific WinAPI calls this service collects info about logon session and using this info to run application in logon session. PR are welcome!
+This service is able to run any application on user login/lock screen. I spend several weeks to collect all solutions from internet into one working project. Using specific WinAPI calls this service collects info about logon session and using this info to run application in logon session. PR are welcome!
 
-Этот сервис может запускать любое приложение на экране входа в систему или экране блокировки. В процессе реализации было потрачено несколько недель времени на сбор и объединение нескольких разных решений с просторов интернета. Используется несколько специфичных WinAPI вызовов для открытия процесса `LogonUI` и получения информации о сессии логина и использовании её для запуска приложения в контексте данной сессии. При этом сам сервис работает от имени системы. Пулл-реквесты приветствуются!
+Этот сервис может запускать любое приложение на экране входа в систему/экране блокировки. В процессе реализации было потрачено несколько недель времени на сбор и объединение нескольких разных решений с просторов интернета. Используется несколько специфичных WinAPI вызовов для открытия процесса `LogonUI` и получения информации о сессии логина и использовании её для запуска приложения в контексте данной сессии. При этом сам сервис работает от имени системы. Пулл-реквесты приветствуются!
 
 ![LogonApplication](https://github.com/VoidVolker/Windows-logon-service/assets/5086438/23dfd564-a8b7-43d2-a96d-3205aa40c341)
 
 # English
+
 ## How to use
 
-1. Download archive for your platform at [Releases](https://github.com/VoidVolker/Windows-logon-service/releases) page
+1. Download archive for your platform at [Releases](https://github.com/VoidVolker/Windows-logon-service/releases) page (for x64 platform download x64 version due system API limitations for x86 apps)
 1. Unzip to `Program files/LogonService` or any other preffered dir
 1. Edit configuration file `LogonService.exe.config`:
-    - `App`, `string`, required, - aplication to run at logon screen, full file path, both slash and backslash is supported (`/` or `\`)
+    - `App`, `string`, required, - aplication to run at logon screen, full file path or relative path to `LogonService.exe` directory, both slash and backslash is supported (`/` or `\`)
     - `App.Arguments`, `string`, optional - application arguments, use single quotes for parameter and double quotes to split arguments with spaces, if no spaces in arguments - use space as argument delimiter and default double quotes for full option string
     - `App.Restart`, `bool`, optional - watch to app stop event and restart application if it was closed, default - `false`
     - `App.RestartLimit`, `uint`, optional - application restarts limit, when it reached Logon Service will stop restarting application, `0` - no limit, default - `10`
@@ -58,7 +59,7 @@ Full example:
      value="0"/>
 ```
 
-Supported delimiters list: ```\t !\\\"#$%&'()*+,-./|:;?[\\]^_`{|}~``` - feel free to use whatever you like.
+Supported delimiters list between property key and application ID: ```\t !\\\"#$%&'()*+,-./|:;?[\\]^_`{|}~``` - feel free to use whatever you like.
 
 ## Config apply
 
@@ -84,10 +85,10 @@ Run classic applications at logon screen can create security issues - be very at
 
 ## Как использовать
 
-1. Скачать архив для вашей платформы на странице [Releases](https://github.com/VoidVolker/Windows-logon-service/releases)
+1. Скачать архив для вашей платформы на странице [Releases](https://github.com/VoidVolker/Windows-logon-service/releases) (для x64 скачивайте сборку x64, т.к. х86 не будет работать из-за ограничений системных вызовов)
 1. Распаковать в `Program files/LogonService` или любой другой каталог
 1. Внести настройки в файл конфигурации `LogonService.exe.config`:
-    - `App`, `string`, обязательно - приложение для запуска, полный путь, оба вида слэшей поддерживаются (`/` или `\`)    
+    - `App`, `string`, обязательно - приложение для запуска, полный путь или относительный путь каталога, в котором находится `LogonService.exe`, оба вида слэшей поддерживаются (`/` или `\`)
     - `App.Arguments`, `string`, опционально - аргументы приложения, дляпередачи аргументов с пробелами используйте одинарные кавычки для опции и двойные кавычки для самих аргументов, если в аргументах нет пробелов - то используйте пробел для разделения аргументов и стандартные двойные кавычки для всей строки опции
     - `App.Restart`, `bool`, опционально - автоматически перезапускать приложение при его остановке, по умолчанию - `false`
     - `App.RestartLimit`, `uint`, опционально - ограничения числа перезапусков приложения, `0` - неограниченное число, по умолчанию - `10`
@@ -133,7 +134,7 @@ LogonService.exe -install
      value="0"/>
 ```
 
-Список поддерживаемых разделителей: ```\t !\\\"#$%&'()*+,-./|:;?[\\]^_`{|}~``` - используйте любой по вашему вкусу.
+Список поддерживаемых разделителей между названием опции и идентификатором приложения: ```\t !\\\"#$%&'()*+,-./|:;?[\\]^_`{|}~``` - используйте любой по вашему вкусу.
 
 ## Применение настроек
 
