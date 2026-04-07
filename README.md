@@ -22,7 +22,7 @@ This service is able to run any application on user login/lock screen. I spend s
     - `Description`, `string`, optional - service description
     - `DisplayName`, `string`, optional - service display name
     - `ServiceName`, `string`, optional - service system level name (no spaces!)
-1. Install service in command line:
+1. Install service in command line from administrator:
 ```cmd
 LogonService.exe -install
 ```
@@ -97,7 +97,7 @@ Run classic applications at logon screen can create security issues - be very at
     - `Description`, `string`, опционально - описание сервиса
     - `DisplayName`, `string`, опционально - название сервиса
     - `ServiceName`, `string`, опционально - системное название сервиса (без пробелов!)
-1. Установить сервис в коммандной строке:
+1. Установить сервис в коммандной строке от администратора:
 ```cmd
 LogonService.exe -install
 ```
